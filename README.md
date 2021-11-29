@@ -56,29 +56,15 @@
 ```swift
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        let bundleId = Bundle.main.bundleIdentifier;
-        let path = Bundle.main.path(forResource: "servers", ofType: "plist") ?? "";
-        let servers = NSDictionary.init(contentsOf: URL.init(fileURLWithPath: path))
-        let data: NSDictionary = servers?[bundleId] as! NSDictionary;
-        let appKey = data["appKey"];
-        let appSecret = data["appSecret"] as! String;
-        let apiServer = data["apiServer"] as! String;
-        let type = data["cryptType"] as! String;
-
-        let cryptType = (type == "MD5") ? FATApiCryptType.MD5 : FATApiCryptType.SM;
-        
-        let config = FATConfig.init(appSecret: appSecret, appKey: appKey as! String);
-        config.apiServer = apiServer
-        config.cryptType = cryptType
+        let config = FATConfig.init(appSecret: "appSecret", appKey: "appKey" );
+        config.apiServer = "apiServer"
         
         do {
             try FATClient.shared().initWith(config);
         }
         catch {
             print(error);
-        }
-        
+        }        
         return true
     }
 
@@ -87,7 +73,7 @@
 ### 第三步打开小程序
 
 ```swift
-FATClient.shared().startRemoteApplet("60c5bbf99e094f00015079ee", startParams: nil, inParentViewController: self, completion: nil)
+FATClient.shared().startRemoteApplet("小程序id", startParams: nil, inParentViewController: self, completion: nil)
 ```
 
 - **SDK KEY** 和 **SDK SECRET** 可以从 [FinClip](https://finclip.com/#/home)  获取，点 [这里](https://finclip.com/#/register) 注册账号；

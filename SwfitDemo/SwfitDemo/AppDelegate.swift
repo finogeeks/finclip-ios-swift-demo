@@ -29,14 +29,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         config.apiServer = apiServer
         config.cryptType = cryptType
         
-        do {
-            try FATClient.shared().initWith(config);
-        }
-        catch {
-            print(error);
-        }
-        
-        
         return true
     }
 
