@@ -47,34 +47,47 @@
 这就是 FinClip ，就是有这么多不可思议！
 
 ## ⚙️ 操作步骤
-### 第一步 修改 Podfile 文件，增加 FinApplet 依赖
-```pod
-source 'https://github.com/CocoaPods/Specs.git'
-pod 'FinApplet'
-```
+### 第一步 增加 FinApplet 依赖
 
-### 第二步 五行代码完成SDK初始化
+
+### 第二步 完成SDK初始化
 在工程的 `AppDelegate` 中的以下方法中，调用 SDK 的初始化方法。
-```objc
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	
-    NSString *appKey = @"SDKKEY";
-    FATConfig *config = [FATConfig configWithAppSecret:@"SECRET" appKey:appKey];
-    config.apiServer = @"https://api.finclip.com"; 
-    config.apiPrefix = @"/api/v1/mop";
-    [[FATClient sharedClient] initWithConfig:config error:nil];
-    
-    return YES;
-}
+
+```swift
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Override point for customization after application launch.
+        let bundleId = Bundle.main.bundleIdentifier;
+        let path = Bundle.main.path(forResource: "servers", ofType: "plist") ?? "";
+        let servers = NSDictionary.init(contentsOf: URL.init(fileURLWithPath: path))
+        let data: NSDictionary = servers?[bundleId] as! NSDictionary;
+        let appKey = data["appKey"];
+        let appSecret = data["appSecret"] as! String;
+        let apiServer = data["apiServer"] as! String;
+        let type = data["cryptType"] as! String;
+
+        let cryptType = (type == "MD5") ? FATApiCryptType.MD5 : FATApiCryptType.SM;
+        
+        let config = FATConfig.init(appSecret: appSecret, appKey: appKey as! String);
+        config.apiServer = apiServer
+        config.cryptType = cryptType
+        
+        do {
+            try FATClient.shared().initWith(config);
+        }
+        catch {
+            print(error);
+        }
+        
+        return true
+    }
+
 ```
 
 ### 第三步打开小程序
-```objc
-NSString *appId = @"小程序id";
-// 打开小程序
-[[FATClient sharedClient] startRemoteApplet:appId startParams:nil InParentViewController:self completion:^(BOOL result, NSError *error) {
-    NSLog(@"result:%d---error:%@", result, error);
-}];
+
+```swift
+FATClient.shared().startRemoteApplet("60c5bbf99e094f00015079ee", startParams: nil, inParentViewController: self, completion: nil)
 ```
 
 - **SDK KEY** 和 **SDK SECRET** 可以从 [FinClip](https://finclip.com/#/home)  获取，点 [这里](https://finclip.com/#/register) 注册账号；
